@@ -3,9 +3,6 @@ import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import emailjs from '@emailjs/browser'
-// Assuming GradientButton is in your components folder. 
-// If not, I have styled a native button inside the form as a fallback/example.
-import GradientButton from '../components/GradientButton' 
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -14,6 +11,22 @@ const Contact = () => {
   const formRef = useRef(null);
   
   const [loading, setLoading] = useState(false);
+
+  // --- INTEGRATED LINKS ---
+  const socialLinks = [
+    { 
+      name: 'LinkedIn', 
+      url: 'https://www.linkedin.com/in/aryan-singh-a38262353/' 
+    },
+    { 
+      name: 'GitHub', 
+      url: 'https://github.com/aryansingh1710' 
+    },
+    { 
+      name: 'Instagram', 
+      url: 'https://www.instagram.com/aryans_019?igsh=ZXE1cHJwazJscHNr' 
+    }
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,9 +79,9 @@ const Contact = () => {
   }, { scope: containerRef });
 
   return (
-    <div ref={containerRef} className='min-h-screen relative bg-black text-white pt-32 pb-20 px-6 lg:px-12 overflow-hidden flex items-center'>
+    <div ref={containerRef} id="contact" className='min-h-screen relative bg-black text-white pt-32 pb-20 px-6 lg:px-12 overflow-hidden flex items-center'>
       
-      {/* 1. Background Glow Effect (Adds Depth) */}
+      {/* 1. Background Glow Effect */}
       <div className='absolute top-[-10%] right-[-5%] w-[300px] h-[300px] lg:w-[600px] lg:h-[600px] bg-purple-900/30 rounded-full blur-[80px] lg:blur-[140px] pointer-events-none' />
       <div className='absolute bottom-[-10%] left-[-5%] w-[200px] h-[200px] lg:w-[400px] lg:h-[400px] bg-blue-900/20 rounded-full blur-[80px] lg:blur-[120px] pointer-events-none' />
 
@@ -94,19 +107,19 @@ const Contact = () => {
               </a>
             </div>
 
-            {/* Socials */}
+            {/* Socials - INTEGRATED HERE */}
             <div>
               <span className='block text-xs md:text-sm text-gray-500 uppercase tracking-widest mb-4'>Social Profiles</span>
               <div className='flex flex-wrap gap-6'>
-                {['LinkedIn', 'GitHub', 'Instagram'].map((social, index) => (
+                {socialLinks.map((social, index) => (
                   <a 
                     key={index}
-                    href="#" // Replace with your actual URLs
+                    href={social.url}
                     target="_blank" 
                     rel="noopener noreferrer"
                     className='text-lg text-gray-400 hover:text-white transition-colors underline decoration-gray-700 hover:decoration-white underline-offset-4'
                   >
-                    {social}
+                    {social.name}
                   </a>
                 ))}
               </div>
@@ -134,7 +147,7 @@ const Contact = () => {
                   type="text" 
                   id="name"
                   name="user_name" 
-                  placeholder="John Doe" 
+                  placeholder="Name" 
                   className='w-full bg-black/20 border-b border-white/20 rounded-t-lg py-4 px-4 text-lg text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:bg-white/5 transition-all'
                 />
               </div>
@@ -146,7 +159,7 @@ const Contact = () => {
                   type="email" 
                   id="email"
                   name="user_email" 
-                  placeholder="john@example.com" 
+                  placeholder="a12345@example.com" 
                   className='w-full bg-black/20 border-b border-white/20 rounded-t-lg py-4 px-4 text-lg text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:bg-white/5 transition-all'
                 />
               </div>

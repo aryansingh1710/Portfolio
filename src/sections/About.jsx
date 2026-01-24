@@ -5,8 +5,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { SplitText } from 'gsap/SplitText'
 import Aryan from '../assets/images/Aryan.png'
 
-// Note: SplitText is a Club GSAP (paid) plugin. 
-// If you are using the free version, this specific animation won't work without a trial/license.
 gsap.registerPlugin(useGSAP, ScrollTrigger, SplitText);
 
 const About = () => {
@@ -14,24 +12,7 @@ const About = () => {
 
   useGSAP(
     () => {
-      // Reverted to lines only for smoother resizing, or keep lines,chars if you prefer
-      const split = SplitText.create(".about-text", {
-        type: "lines,chars", 
-      });
-
-      gsap.set(split.chars, { opacity: 0.25 });
-
-      gsap.to(split.chars, {
-        opacity: 1,
-        stagger: 0.05,
-        scrollTrigger: {
-          trigger: aboutRef.current,
-          start: "top 60%",
-          end: "center center",
-          scrub: 1
-        }
-      });
-
+      // 1. Image Animation (unchanged, acts as the anchor)
       gsap.from(".about-img", {
         clipPath: "inset(0 100% 0 0)",
         duration: 1.5,
@@ -41,6 +22,31 @@ const About = () => {
           start: "top 60%",
         }
       });
+
+      // 2. Strong Text Animation (Words + Blur + Slide)
+      if (typeof SplitText !== "undefined") {
+          // We split by words for better performance than chars, but more detail than lines
+          const split = new SplitText(".about-text-p", { type: "words" });
+
+          gsap.from(split.words, {
+            opacity: 0,
+            y: 30, // Move up by 30px
+            filter: "blur(10px)", // Cinematic blur effect
+            duration: 0.8,
+            stagger: 0.02, // Fast ripple effect
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: ".about-text-container",
+              start: "top 75%", // Starts when text is 75% down the screen
+              toggleActions: "play none none reverse" // Plays naturally, reverses if you scroll back up
+              // NOTE: 'scrub' is removed to make the animation feel "stronger" and smoother
+            }
+          });
+      } else {
+          // Fallback
+          gsap.from(".about-text-p", { opacity: 0, y: 20, duration: 1, stagger: 0.2 });
+      }
+
     },
     { scope: aboutRef }
   )
@@ -48,13 +54,11 @@ const About = () => {
   return (
     <div 
       ref={aboutRef} 
-      // UPDATED: Added Gradient Background and Text White
       className='min-h-screen relative z-10 bg-gradient-to-b from-[#1f1f1f] to-black text-white rounded-tl-[60px] rounded-tr-[60px] py-12 lg:py-24 overflow-hidden flex flex-col'
     >
       
       <div className='main-container px-6 md:px-12 flex-grow flex flex-col justify-center'>
         
-        {/* UPDATED: Changed text to gray-400 and border to white/20 for dark mode contrast */}
         <h2 className='text-gray-400 text-sm md:text-md font-bold uppercase tracking-widest mb-10 md:mb-16 border-b border-white/20 pb-4'>
           About Me
         </h2>
@@ -63,24 +67,33 @@ const About = () => {
 
           {/* Left: Image */}
           <div className='md:col-span-5 w-full flex justify-center md:justify-start'>
-            {/* UPDATED: Changed bg-gray-200 to bg-gray-800 for the placeholder */}
-            <div className='about-img relative w-full aspect-[3/4] max-w-[400px] bg-gray-800 rounded-2xl overflow-hidden'>
+            <div className='about-img relative w-full aspect-[3/4] max-w-[400px] bg-gray-800 rounded-2xl overflow-hidden will-change-[clip-path]'>
               <img 
                 src={Aryan} 
-                alt="Portrait of me" 
-                className='w-full h-full object-cover opacity-90' // Added slight opacity to blend better
+                alt="Portrait of me"
+                loading="lazy"
+                decoding="async"
+                className='w-full h-full object-cover opacity-90' 
               />
             </div>
           </div>
 
           {/* Right: Text */}
-          <div className='md:col-span-7'>
-            {/* UPDATED: Decreased text sizes and set color to gray-200 */}
-            <p className='about-text font-heading text-gray-200 text-base leading-relaxed md:text-lg xl:text-xl'>
-              I’m a web developer who focuses on building clean, functional, and performance-driven web experiences. I work with HTML, CSS, JavaScript, and React, and I care deeply about writing readable code and creating intuitive user interfaces.
-              <br /><br />
-              I believe good software is not just about working code—it’s about solving the right problem efficiently. I actively build projects, explore new technologies, and sharpen my fundamentals in data structures, databases, and system design to grow as a well-rounded developer.
+          <div className='md:col-span-7 about-text-container'>
+            {/* STRUCTURED CONTENT:
+               I have broken the text into two distinct paragraphs with a gap.
+               I also added highlight classes (text-white/font-semibold) to key terms 
+               to make the portfolio scanable.
+            */}
+            
+            <p className='about-text-p font-heading text-gray-300 text-base leading-relaxed md:text-lg xl:text-xl mb-8'>
+              I’m a web developer who focuses on building <span className="text-white font-semibold">clean, functional, and performance-driven</span> web experiences. I work with <span className="text-cyan-400">React, JavaScript, and GSAP</span>, and I care deeply about writing readable code and creating intuitive user interfaces.
             </p>
+
+            <p className='about-text-p font-heading text-gray-300 text-base leading-relaxed md:text-lg xl:text-xl'>
+              I believe good software is not just about working code—it’s about solving the right problem efficiently. I actively build projects, explore new technologies, and sharpen my fundamentals in <span className="text-white font-semibold">System Design and Databases</span> to grow as a well-rounded developer.
+            </p>
+
           </div>
 
         </div>

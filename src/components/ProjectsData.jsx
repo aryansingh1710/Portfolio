@@ -19,18 +19,6 @@ const projects = [
     name: "DSA Visualizer",
     image: "https://4kwallpapers.com/images/walls/thumbs_2t/9324.jpg",
     link: "https://dsavisualizer.com"
-  },
-   {
-    id: 3,
-    name: "DSA Visualizer",
-    image: "https://4kwallpapers.com/images/walls/thumbs_2t/9324.jpg",
-    link: "https://dsavisualizer.com"
-  },
-  {
-    id: 3,
-    name: "DSA Visualizer",
-    image: "https://4kwallpapers.com/images/walls/thumbs_2t/9324.jpg",
-    link: "https://dsavisualizer.com"
   }
 ];
 export default projects;
