@@ -3,14 +3,13 @@ import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { SplitText } from 'gsap/SplitText'
-
+import { Link } from 'react-router-dom'
 gsap.registerPlugin(useGSAP, ScrollTrigger, SplitText);
 
-// OPTIMIZATION: Move static data outside the component to prevent re-creation on render
 const STAR_PATH = "M290.361 1.55586L333.686 284.91L333.88 286.179L334.595 285.113L496.712 43.717L530.894 66.1539L354.53 298.389L353.719 299.458L355.031 299.181L644.781 238.164L651.693 276.115L359.086 321.397L357.759 321.603L358.897 322.315L605.849 476.828L581.885 510.335L344.939 341.783L343.894 341.039L344.16 342.294L403.733 622.684L363.139 630.093L319.819 346.737L319.626 345.469L318.911 346.533L156.783 587.928L122.522 565.048L298.964 333.261L299.777 332.192L298.463 332.469L8.73027 393.473L1.564 354.211L294.405 310.246L295.74 310.046L294.596 309.329L47.5646 154.374L71.6092 121.305L308.567 289.864L309.612 290.609L309.345 289.353L249.767 8.96535L290.361 1.55586Z";
 
-// OPTIMIZATION: Memoize the noise background to avoid recalculating the string
-const NOISE_BG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`;
+// OPTIMIZATION: Reduced baseFrequency to 0.6 (slightly less calculation)
+const NOISE_BG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`;
 
 const Hero = () => {
   const heroRef = useRef(null)
@@ -23,11 +22,12 @@ const Hero = () => {
         end: "bottom top",
         pin: true,
         pinSpacing: false,
-        scrub: 1
+        scrub: 1,
+        // OPTIMIZATION: Prevents glitching on fast mobile scrolls
+        fastScrollEnd: true, 
       })
 
       // 1. Name Animation
-      // Check if SplitText is available to prevent crashing if plugin fails to load
       if (typeof SplitText !== "undefined") {
           const splitName = new SplitText("h1", { type: "lines,words", linesClass: "overflow-hidden" });
           gsap.from(splitName.words, {
@@ -35,7 +35,8 @@ const Hero = () => {
             opacity: 0,
             stagger: 0.05,
             duration: 1,
-            ease: "power4.out"
+            ease: "power4.out",
+            force3D: true // OPTIMIZATION: Force GPU
           });
 
           const splitTitle = new SplitText("h2", { type: "lines,words", linesClass: "overflow-hidden" });
@@ -46,11 +47,11 @@ const Hero = () => {
             stagger: 0.1,
             delay: 0.2,
             duration: 1.2,
-            ease: "power3.out"
+            ease: "power3.out",
+            force3D: true // OPTIMIZATION: Force GPU
           });
       } else {
-          // Fallback if SplitText isn't loaded
-          gsap.from("h1, h2", { y: 50, opacity: 0, duration: 1 });
+          gsap.from("h1, h2", { y: 50, opacity: 0, duration: 1, force3D: true });
       }
 
       // Button Animation
@@ -59,7 +60,8 @@ const Hero = () => {
         opacity: 0,
         delay: 1,
         duration: 1,
-        ease: "power3.out"
+        ease: "power3.out",
+        force3D: true
       })
 
       // Star Animation
@@ -70,13 +72,14 @@ const Hero = () => {
         transformOrigin: "center",
         duration: 1.5,
         ease: "back.out(1.7)",
+        force3D: true, // OPTIMIZATION
         onComplete: () => {
-          // OPTIMIZATION: Animating the SVG specifically
           gsap.to(".star-svg", {
             rotate: "+=360",
             duration: 25,
             repeat: -1,
-            ease: "linear"
+            ease: "linear",
+            force3D: true // OPTIMIZATION
           })
         }
       })
@@ -98,10 +101,19 @@ const Hero = () => {
       ">
 
         {/* --- Background Effects --- */}
-        {/* OPTIMIZATION: Reduced blur radius slightly for performance */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-purple-900/10 rounded-full blur-[80px] pointer-events-none z-0"></div>
         
-        <div className='absolute inset-0 opacity-[0.03] pointer-events-none z-0 mix-blend-overlay' 
+        {/* OPTIMIZATION: Replaced 'blur' filter with Radial Gradient. 
+            Blurs are expensive; Gradients are cheap. 
+            This mimics the purple glow without the heavy render cost. */}
+        <div 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] rounded-full pointer-events-none z-0"
+            style={{
+                background: 'radial-gradient(circle, rgba(88, 28, 135, 0.2) 0%, rgba(5, 5, 5, 0) 70%)'
+            }}
+        ></div>
+        
+        {/* OPTIMIZATION: Added will-change-transform to separate noise from other layers */}
+        <div className='absolute inset-0 opacity-[0.03] pointer-events-none z-0 mix-blend-overlay will-change-transform' 
              style={{backgroundImage: NOISE_BG}}>
         </div>
 
@@ -115,6 +127,7 @@ const Hero = () => {
           tracking-[0.2em]
           text-gray-400
           mb-6 pl-1
+          will-change-transform
         ">
           Aryan Singh
         </h1>
@@ -128,6 +141,7 @@ const Hero = () => {
           tracking-tighter 
           text-white
           mb-8 md:mb-12
+          will-change-transform
         ">
           Full Stack <br />
           <div className="flex flex-wrap items-center gap-x-4 gap-y-0">
@@ -138,8 +152,8 @@ const Hero = () => {
         </h2>
 
         {/* 3. Button */}
-        <div className="relative z-10 w-full sm:w-auto gradien-btn">
-          <a href="/resume.pdf" className="group relative inline-block p-[2px] rounded-full bg-gradient-to-r from-[#FF4D6D] via-[#7B2FF7] to-[#2FF7ED]">
+        <div className="relative z-10 w-full sm:w-auto gradien-btn will-change-transform">
+          <Link to="/contact" className="group relative inline-block p-[2px] rounded-full bg-gradient-to-r from-[#FF4D6D] via-[#7B2FF7] to-[#2FF7ED]">
             <span className="
               block px-8 py-3 rounded-full 
               bg-[#050505] text-white font-bold tracking-widest uppercase 
@@ -147,22 +161,21 @@ const Hero = () => {
               group-hover:bg-transparent group-hover:text-black
               relative z-10
             ">
-              Download Resume
+              Let's Connect
             </span>
             <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#FF4D6D] via-[#7B2FF7] to-[#2FF7ED] opacity-0 blur-lg group-hover:opacity-50 transition-opacity duration-300 -z-10"></div>
-          </a>
+          </Link>
         </div>
 
-        {/* 4. Optimized Star (Glow Removed) */}
-        {/* OPTIMIZATION: Added 'will-change-transform' to hint the browser */}
+        {/* 4. Optimized Star */}
+        {/* OPTIMIZATION: Reduced width on mobile to save memory */}
         <div className="star-container absolute -z-10 pointer-events-none
-          w-[140vw] right-[-50%] top-[15%] opacity-40
+          w-[100vw] right-[-30%] top-[15%] opacity-40
           sm:w-[80vw] sm:right-[-30%] sm:top-auto sm:opacity-80
           lg:w-[50vw] lg:right-[-12%] lg:top-[10%] lg:opacity-100
+          will-change-transform
         ">
-           {/* The blurred div that created the glow has been removed from here. */}
-
-           <svg className="star-svg w-full h-full will-change-transform"
+           <svg className="star-svg w-full h-full"
             viewBox="0 0 653 631" fill="none"
             xmlns="http://www.w3.org/2000/svg">
             <path d={STAR_PATH}
