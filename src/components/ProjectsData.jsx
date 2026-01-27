@@ -2,7 +2,7 @@
 // This reduces unnecessary dependencies in this specific module.
 
 import cola from '../assets/images/cola.png';
-import stikr from '../assets/images/strikr.png';
+import strikr from '../assets/images/strikr.png';
 
 const projects = [
   {
