@@ -4,6 +4,7 @@ import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ArrowUpRight, Code2 } from 'lucide-react' // Added Code2 icon for extra flair
+import { Link } from 'react-router-dom'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -70,8 +71,8 @@ const Work = () => {
 
         {/* --- FIXED BUTTON --- */}
         <div className='mt-10 md:mt-0'>
-           <a 
-             href="/projects" 
+           <Link 
+             to="/projects" 
              className='group relative inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white/5 border border-white/10 hover:border-white/30 transition-all duration-300 overflow-hidden'
            >
              <div className='absolute inset-0 bg-gradient-to-r from-[#FF4D6D] via-[#7B2FF7] to-[#2FF7ED] opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out'></div>
@@ -80,7 +81,7 @@ const Work = () => {
                View All Works
              </span>
              <ArrowUpRight className='relative z-10 w-5 h-5 text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300' />
-           </a>
+           </Link>
         </div>
       </div>
 
