@@ -3,6 +3,7 @@
 
 import cola from '../assets/images/cola.png';
 import strikr from '../assets/images/strikr.png';
+import dsa from '../assets/images/spyl.png';
 
 const projects = [
   {
@@ -21,11 +22,11 @@ const projects = [
   },
   {
     id: 3,
-    name: "DSA Visualizer",
-    category: "Algorithms", // Added category
+    name: "Spylt GSAP",
+    category: "Animation", // Added category
     // NOTE: For production, try to use a compressed local image instead of a 4K external URL
     // to prevent slow loading on mobile data.
-    image: "https://4kwallpapers.com/images/walls/thumbs_2t/9324.jpg",
+    image: dsa,
     link: "https://dsavisualizer.com"
   }
 ];

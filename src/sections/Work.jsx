@@ -81,7 +81,7 @@ const Work = () => {
                View All Works
              </span>
              <ArrowUpRight className='relative z-10 w-5 h-5 text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300' />
-           </Link>
+           </Link      >
         </div>
       </div>
 
